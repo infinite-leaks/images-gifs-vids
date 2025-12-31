@@ -1,93 +1,102 @@
-# 666 Discord Bot
+# Ai Bot
 
-This document details the internal mechanics, feature set, and command structure of the 666 Discord Bot. The bot is designed with a modular architecture focusing on advanced embed theming, file uploading with metadata injection, automated moderation, and system monitoring.
+This document details the features and operational logic of the Ai Bot, a multi-purpose tool powered by Google's Gemini models.
 
-## System Architecture
+## I. AI & Chatbot Capabilities
 
-The bot operates on a configuration-driven model using persistent JSON storage for state management. It utilizes asynchronous network requests to handle file uploads and status checks without blocking the main event loop.
+The bot's core functionality revolves around its integration with Google's Gemini AI models, providing advanced conversational and analytical abilities.
 
-### Configuration Files
-*   **themes.json**: Stores visual themes and global display settings like private mode and Twitter preview toggles.
-*   **auth.json**: Manages the whitelist of users authorized to use restricted commands.
-*   **uploads.json**: Logs the history of all file uploads, including URLs, timestamps, and deletion keys.
-*   **prefixes.json**: Stores custom command prefixes on a per-guild basis.
-*   **bot_config.json**: Stores logging configuration, including the webhook URL and toggle states for specific event notifications.
-*   **upload_configs.json**: Contains API credentials and endpoints for the file hosting services.
-*   **og_presets.json**: Defines reusable templates for Open Graph meta tags used during file uploads.
+*   **Conversational AI**: The bot responds to direct mentions or to all messages within a designated "chatbot channel." It uses the `gemini-2.5-flash` model for general chat to ensure speed and availability.
 
-## Core Features
+*   **Contextual Memory**: In chatbot channels, the bot fetches the last 10 messages to build a conversation history. This allows it to understand context, remember previous parts of the conversation, and provide more relevant follow-up responses.
 
-### Theming Engine
-The bot employs a dynamic theming system that intercepts outgoing embeds and applies visual properties based on the active configuration.
+*   **Custom Personas**: Administrators can define a unique personality for the AI on a per-server basis using the `/personality` command. This instruction is injected into the AI's memory, forcing it to adopt a specific tone, character, or set of rules for all its responses within that server.
 
-*   **Standard Themes**: Applies consistent colors, footer text, author icons, and thumbnail images to embeds.
-*   **V2 Layout Engine**: Supports complex embed structures defined by a layout array. This allows for:
-    *   **Text Injection**: Inserting static text or dynamic content placeholders.
-    *   **Separators**: Visual dividers between content sections.
-    *   **Images**: Defining specific image placements.
-    *   **Sections**: Creating distinct fields within the embed.
-*   **Private Mode**: A global toggle that forces all bot responses to be "ephemeral" (visible only to the command initiator), ensuring privacy during operation.
+*   **Multi-Modal Analysis**: The `/ask` command and general chat support image attachments. The bot can analyze the content of images (JPEG, PNG, GIF, etc.) and answer questions about them.
 
-### File Upload System
-A proxy system for uploading files to external hosts with custom metadata.
+*   **Advanced Model Access**: Authorized users can access the more powerful `gemini-2.5-pro` model via the `/ask` command for more complex reasoning and generation tasks.
 
-*   **Open Graph Injection**: The bot sends a JSON payload alongside the file data to inject custom `og:title`, `og:description`, and `og:color` tags into the resulting URL.
-*   **Interactive Menu**: The upload command triggers a UI with dropdowns to select the destination domain and metadata presets.
-*   **Presets**: Users can select pre-defined metadata templates. These templates support placeholders like `{user}`, `{date}`, `{time}`, and `{file_size}` which are populated at runtime.
-*   **Logging & Management**: Every upload is logged. Users can view their upload history, and authorized users can delete files directly through the bot using the stored deletion keys.
+*   **Content Summarization**: The `/summarize` command can process either a block of text or a URL. For URLs, it fetches the webpage content, strips all HTML and script tags, and sends the clean text to the AI for a concise summary.
 
-### Automated Moderation
-The bot monitors guild activity for patterns indicative of raids or spam.
+*   **Safety Controls**: Server administrators can adjust the AI's content safety level using `/setsafety`, choosing from `none`, `low`, `medium`, or `high` to control the strictness of the content filter.
 
-*   **Raid Detection**: Triggers if a specific number of members join within a short timeframe (default: 5 members in 8 seconds).
-*   **Spam Detection**: Triggers if a single user sends a specific number of messages rapidly (default: 5 messages in 5 seconds).
-*   **Mitigation Tools**: When an alert is triggered, the bot sends a notification with interactive buttons to Ban, Mute (Timeout), or Dismiss the alert. The Mute button includes a dropdown to select the timeout duration.
+## II. Developer Toolkit
 
-### Notification System
-A centralized logging system that forwards events to a configured webhook.
+A comprehensive suite of over 50 commands designed to assist with the entire software development lifecycle, organized into three logical groups.
 
-*   **Event Types**:
-    *   Command Errors
-    *   Member Bans and Unbans (includes moderator and reason from audit logs)
-    *   Raid and Spam Detections
-    *   Bot Guild Joins/Leaves
-    *   Message Deletions and Edits
-*   **Configuration**: The owner can toggle specific notification types on or off via a GUI menu.
+### Code Group (`/code`)
+Commands for direct code generation, analysis, and manipulation.
+*   **Generation**: `generate`, `algorithm`, `designpattern`, `boilerplate`, `codechallenge`.
+*   **Analysis & Review**: `explain`, `debug`, `complexity`, `optimize`, `securityscan`, `codereview`.
+*   **Documentation**: `document`, `docstring`, `visualize` (creates Mermaid.js diagrams).
+*   **Conversion**: `convert` (translates between languages), `refactor`.
+*   **Testing**: `unittest`, `testdata`.
 
-### Utilities
-*   **Service Status**: Checks the API status of Cloudflare, Vercel, and Netlify.
-*   **Twitter/X Fixer**: Automatically detects `twitter.com` and `x.com` links in messages and replaces them with `fxtwitter.com` links to ensure media embeds render correctly. The original message is deleted.
-*   **System Info**: Displays real-time CPU usage, RAM usage, uptime, and latency.
+### Project Group (`/project`)
+Commands for project setup, management, and documentation.
+*   **Scaffolding**: `readme`, `gitignore`, `structure`, `makefile`, `config`, `envexample`.
+*   **DevOps & Deployment**: `dockerfile`, `cicd`, `deploy`, `shell` (generates shell scripts).
+*   **Planning & Management**: `commit` (generates conventional commit messages), `userstory`, `releasenotes`, `changelog`, `roadmap`, `breakdown`, `prdescription`.
+*   **Naming & Presentation**: `nameit`, `presentation`, `colorpalette`.
 
-## Command Reference
+### Data Group (`/data`)
+Commands for handling data structures, APIs, and databases.
+*   **Database**: `sql` (generates queries), `dbschema` (designs table structures).
+*   **API**: `apirequest`, `apidesign`, `apidoc` (generates OpenAPI/Swagger specs), `endpoint`.
+*   **Data Manipulation**: `regex`, `formatconvert`, `localize` (translates JSON language files).
+*   **Web**: `scraper` (generates a Python web scraper).
 
-### General & Utility
-*   `/projectinfo`: Displays detailed system statistics, bot version, and resource usage.
-*   `/checkstatus [service]`: Checks the operational status of Vercel, Cloudflare, or Netlify.
-*   `/voice join`: Joins the voice channel the user is currently in.
-*   `/voice leave`: Disconnects the bot from the current voice channel.
-*   `/nightyscripting help`: Provides documentation links for Nighty UI scripting.
-*   `/prefix [new_prefix]`: Sets the command prefix for the current server (Requires Manage Server permission).
-*   `.emoji` (Reply Only): Enlarges custom emojis found in the replied message and provides their image links.
+## III. Server Administration & Moderation
 
-### Theme Management (Owner Only)
-*   `/theme select [theme_name]`: Sets the active visual theme for the bot.
-*   `/theme list`: Displays a list of all available themes.
-*   `/theme current`: Shows a preview of the currently active theme.
-*   `/theme add [name] [json_string]`: Adds a new theme configuration via a JSON string.
-*   `/theme delete [theme_name]`: Deletes an existing theme configuration.
+A robust set of tools for server management, logging, and automation, with all settings stored persistently in a database.
 
-### File Uploads & Access (Authorized Users)
-*   `/misc upload [file]`: Opens the interactive menu to upload a file with custom domain and Open Graph settings.
-*   `/misc delete [deletion_url]`: Deletes a file from the host using its deletion URL.
-*   `/misc nightyauth`: Displays the authentication GIF (Authorized users only).
+### Logging Systems
+*   **Message Logger**: Tracks message edits and deletions in a designated webhook channel. It captures the original content, author, and channel information.
+*   **Voice Logger**: Monitors and logs voice channel activity, including when users join, leave, or switch channels.
 
-### Administration & Configuration (Owner Only)
-*   `/misc access [user] [grant/revoke]`: Grants or revokes access to restricted commands (like upload) for a specific user.
-*   `/misc listauth`: Lists all users who have been granted access.
-*   `/misc private [on/off]`: Toggles "Private Mode", making all bot responses ephemeral.
-*   `/misc uploads [user]`: Views upload statistics. If a user is specified, shows their uploads; otherwise, shows global stats.
-*   `/misc purge [upload_url]`: Removes a specific upload record from the bot's local log without deleting the file from the host.
-*   `/misc setnotifychannel [channel]`: Sets the text channel where the bot will send log notifications.
-*   `/misc notifystatus`: Checks the current status of the notification channel configuration.
-*   `/misc notifyconfig`: Opens an interactive menu to toggle specific notification events (e.g., bans, errors, spam).
+### Automated Moderation & Management
+*   **New Account Restriction**: Automatically assigns a "Restricted" role to newly joined members whose accounts are younger than a configurable age (e.g., 7 days). This role's permissions can be configured to limit access for new accounts.
+*   **Auto-Clean**: A background task that periodically purges messages from a configured channel that are older than a set time limit, while preserving pinned messages.
+*   **Sticky Messages**: A system to maintain a specific message at the bottom of a channel. The bot automatically reposts the message whenever a new message is sent.
+*   **Message Migration**: A utility to copy a large number of messages from a source channel to a destination channel. It uses webhooks to impersonate the original authors, preserving their names and avatars for a seamless transfer.
+*   **Ban Transfer**: A tool to iterate through the entire ban list of one server and apply those same bans to another server, useful for synchronizing moderation actions across communities.
+
+### Community & Engagement Tools
+*   **Announcements**: Allows administrators to create and send rich, webhook-based announcements that impersonate the server's name and icon.
+*   **Polls**: Creates interactive polls with buttons for voting. The bot tracks votes and updates the button labels with the current count.
+*   **Global Suggestion System**: Users can submit suggestions via `/suggest`. These are sent to a central, owner-configured channel for review. Admins can approve or deny suggestions, which updates the original suggestion message with the new status and reason.
+
+## IV. Utility & Fun Features
+
+A wide range of commands for entertainment, information lookup, and general utility.
+
+### Information & System
+*   **System Info (`/info`)**: Displays a detailed embed with bot statistics (version, uptime, server/user count), system resource usage (CPU, RAM), and project information.
+*   **HTML Channel Export (`/exporthtml`)**: Generates a self-contained HTML file of a channel's message history, replicating the Discord UI. The file includes client-side JavaScript for searching and filtering messages.
+*   **Invite Lookup (`/invitelookup`)**: Fetches and displays detailed information about a Discord invite link, including server features, member counts, and boost status.
+
+### User Tools
+*   **AFK System**: Users can set an AFK status with a custom message. The bot will automatically reply when the AFK user is mentioned, subject to a configurable cooldown. It can also optionally prepend `[AFK]` to the user's nickname.
+*   **File Upload (`/ez`)**: Integrates with the `e-z.gg` file hosting service, allowing users to upload files using their personal API key (stored securely in the bot's database).
+*   **VirusTotal Scan (`/vtscan`)**: Uploads a file to the VirusTotal API and polls for a report, displaying the detection ratio and threat level.
+*   **Secret Cipher (`/cipher`)**: Encrypts and decrypts text using a custom reversible algorithm, allowing users to hide messages.
+
+### Media & Image Manipulation
+*   **Social Media Downloaders**:
+    *   `/downloadtiktok`: Downloads a TikTok video without the watermark.
+    *   `/twitter`: Downloads videos, GIFs, or images from a Twitter/X link using the `fxtwitter` API.
+*   **Image Generation**:
+    *   `/caption`: Adds a white caption bar to the top of an image or GIF, processing each frame of an animation.
+    *   `/quote`: Creates a fake "Discord message" image from a specified user and text.
+    *   `/mcachievement`: Generates a custom Minecraft achievement image.
+*   **Text Manipulation (`/text`)**: A group of commands to style text with markdown, convert it to fancy Unicode fonts, or apply transformations like `reverse`, `zalgo`, and `OwOify`.
+
+### Game Integrations
+*   **Valorant (`/valorant`)**: A full suite of commands to look up data on agents, weapons, maps, sprays, and more, using a cached connection to the `valorant-api.com` API.
+*   **Roblox (`/robloxuser`)**: Retrieves a user's profile, avatar, join date, and created games from Roblox's public APIs.
+*   **Rockstar (`/rockstar`)**: Scrapes the Social Club to display user profiles and GTA V character stats.
+
+### Fun & Miscellaneous
+*   **Troll Commands**: Includes `/trollnitro` for sending a harmless fake Nitro link and `/troll move` for repeatedly moving a user between voice channels.
+*   **Cat Commands (`/cat`)**: Fetches random cat images or GIFs.
+*   **Simple Games**: `/coinflip` and `/8ball`.
